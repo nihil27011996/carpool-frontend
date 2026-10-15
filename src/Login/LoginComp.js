@@ -53,7 +53,36 @@ const Login = () => {
     } catch (error) {
       setError(error.message || "Unable to log in. Please try again.");
       setErrorFlag(true);
+      setTimeout(() => {
+        setErrorFlag(false);
+      }, 10000);
+      return;
     }
+
+    setError("");
+    setErrorFlag(false);
+
+    const existingRecordData = await existingRecordResponse.json();
+    handleSession(existingRecordData.token);
+    dispatch(
+      storeUser({
+        userData: existingRecordData,
+      })
+    );
+    dispatch(
+      storeAuth({
+        isAuthenticated: true,
+        expiryTime: Date.now() + 3600000,
+      })
+    );
+    setTimer();
+    setTimeout(() => {
+      if (existingRecordData.commuterType === "Rider") {
+        navigate("/searchRide");
+      } else if (existingRecordData.commuterType === "Driver") {
+        navigate("/createRide");
+      }
+    }, 100);
   };
 
   const togglePasswordType = (e) => {

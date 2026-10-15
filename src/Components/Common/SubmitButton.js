@@ -13,7 +13,7 @@ function SubmitButton({ submitform, disabled, text, buttonStyle }) {
       onClick={submitForm}
       name={text}
       value={text}
-      className={buttonStyle || styles.submitButton}
+      className={buttonStyle}
       disabled={disabled}
     >
       {text}

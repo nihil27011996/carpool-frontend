@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { createUser } from "../Utils/Signup/SignUp";
+import { useNavigate, Link } from "react-router-dom";
+import { userExits, createUser } from "../Utils/Signup/SignUp";
+import SubmitButton from "../Components/Common/SubmitButton.js";
 import styles from "./ProfileCreation.module.css";
 
 const ProfileCreation = () => {
@@ -96,8 +97,7 @@ const ProfileCreation = () => {
   return (
     <div className={styles.registerParentContainer}>
       <div className={styles.registerContainer}>
-        <form className={styles.signUpForm} onSubmit={handleSubmit}>
-          {error && <p role="alert">{error}</p>}
+        <form className={styles.signUpForm}>
           <h1>Create your driver profile</h1>
           <div className={styles.subText}>Register to Book a Ride</div>
           <div className={styles.inputDiv}>
@@ -236,7 +236,11 @@ const ProfileCreation = () => {
               <option value="Driver">Driver</option>
             </select>
           </div>
-          <button type="submit" className={styles.submitButton}>CREATE PROFILE</button>
+          <SubmitButton
+            submitform={handleSubmit}
+            buttonStyle={styles.submitButton}
+            text="CREATE PROFILE"
+          ></SubmitButton>
           <div>
             <span>Already have an Account?</span>&nbsp;
             <Link className={styles.linkText} to="/login">

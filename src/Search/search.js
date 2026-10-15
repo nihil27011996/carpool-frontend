@@ -1,5 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
+import PaymentComp from "../Payment/payment";
 import GetClosestDriver from "./Components/GetClosestDriver.js";
 import styles from "./Search.module.css";
 import { useSelector } from "react-redux";
@@ -7,11 +8,16 @@ import { Navigate } from "react-router-dom";
 import SearchDriverButton from "../Components/Common/SearchDriverButton.js";
 import MapComponent from "../Components/Common/MapComponent.js";
 import ModalComponent from "../Components/Common/modalcomponent.js";
+import { riderRequest } from "../Utils/utils.js";
+import { useDispatch } from "react-redux";
+import { storeRider } from "../Slice/riderSlice.js";
+
 const libraries = ["places"];
 const RiderFinder = () => {
   /*   const storedData = localStorage.getItem('rider');
   const parsedData? = JSON.parse(storedData); */
   const parsedData = useSelector((state) => state.user.userData);
+  const navigate = useNavigate();
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [pickUpTime, setPickUpTime] = useState("");
@@ -19,10 +25,52 @@ const RiderFinder = () => {
   const [seats, setSeat] = useState("");
   const [diplayDrivers, setDisplayDrivers] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPayment, setshowPayment] = useState(false);
+  const [showButton, setShowButton] = useState(true);
+  const [costPerSeat, setCostPerSeat] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const toggleModal = () => {
     setIsOpen(!isOpen);
   };
+
+  if (!parsedData) {
+    navigate("/login");
+  }
+
+  /*  useEffect(() => {
+    async function fetchData() {
+      const existingRecord = await riderRequest(
+        parsedData?.id,
+        parsedData?.token
+      );
+      if (!existingRecord.ok) {
+        dispatch(storeRider({}));
+        navigate("/login");
+      }
+      const existingRecordData = await existingRecord.json();
+      if (!existingRecordData) {
+        setShowButton(true);
+        return;
+      } else if (existingRecordData.length > 0) {
+        const recordPayment = existingRecordData.filter(
+          (record) =>
+            record.CommuteStatus === "Approved" && record.PaymentFlag == "N"
+        );
+        if (recordPayment.length > 0) {
+          setshowPayment(true);
+          return;
+        }
+      } else if (
+        existingRecordData.CommuteStatus === "Approved" &&
+        existingRecordData.PaymentFlag === "N"
+      ) {
+        setshowPayment(true);
+        return;
+      }
+    }
+
+    fetchData();
+  }, [showButton, showPayment, parsedData?.token, parsedData?.userId]); */
 
   const originRef = useRef();
   const destinationRef = useRef();

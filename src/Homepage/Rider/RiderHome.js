@@ -12,7 +12,7 @@ const RiderHome = () => {
   /*    const storedData = localStorage.getItem('rider');
   const driverData = JSON.parse(storedData); */
   const driverData = useSelector((state) => state.user.userData);
-  const driverId = driverData?.userId;
+  const driverId = driverData.userId;
   const [profileData, setProfileData] = useState([]);
   const [error, setError] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -96,7 +96,6 @@ const RiderHome = () => {
 
   return (
     <div className={styles.riderHomeMainPage}>
-      {error && <p role="alert">{error}</p>}
       {load ? (
         <div
           style={{

@@ -7,6 +7,24 @@ import SubmitButton from "../Components/Common/SubmitButton.js";
 const libraries = ["places"];
 const DriverRide = () => {
   const parsedData = useSelector((state) => state.user.userData);
+  const navigate = useNavigate();
+  const [data, setData] = useState({
+    DriverOrderNumber: "",
+    DriverId: "",
+    StartingLocation: "",
+    Destination: "",
+    DriverPostStatus: "Open",
+    Seats: "",
+    Cost: "",
+    OriginLatitude: "",
+    OriginLongitude: "",
+    DestinationLatitude: "",
+    DestinationLongitude: "",
+  });
+  const [originLat, setOriginLat] = useState(0);
+  const [originLng, setOriginLng] = useState(0);
+  const [destinationLat, setDestinationLat] = useState(0);
+  const [destinationLng, setDestinationLng] = useState(0);
   const [pickUpTime, setPickUpTime] = useState("");
   const [cost, setCost] = useState(0);
   const [seats, setSeats] = useState(0);
@@ -24,13 +42,16 @@ const DriverRide = () => {
     }
   };
 
-  const fetchData = useCallback(async () => {
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
     try {
       const existingRecord = await fetchOngoingRide(
         parsedData.id,
         parsedData.token
       );
-      if (!existingRecord.ok) throw new Error("Failed to load ongoing rides");
       const reponse = await existingRecord.json();
       // Check if the response is null or undefined
       if (reponse.length === 0) {
@@ -47,10 +68,7 @@ const DriverRide = () => {
       setErrorFlag(true);
       setShowButton(false); // Ensure button is hidden on error
     }
-  }, [parsedData.id, parsedData.token]);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
-
+  };
 
   const originRef = useRef();
   const destinationRef = useRef();

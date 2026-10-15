@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { logout } from "../../Utils/session";
-
+import { removeUser } from "../../Slice/userSlice";
+import { removeAuth } from "../../Slice/authSlice";
 import { Link } from "react-router-dom";
 import styles from "./navBarComponent-rider.module.css";
 
@@ -13,7 +13,10 @@ import styles from "./navBarComponent-rider.module.css";
 const RiderNavBar = ({ riderData }) => {
   const dispatch = useDispatch();
 
-  const handleLogoutButton = () => dispatch(logout());
+  const handleLogoutButton = () => {
+    dispatch(removeUser());
+    dispatch(removeAuth());
+  };
 
   return (
     <header className={styles.header}>
