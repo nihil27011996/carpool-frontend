@@ -1,8 +1,11 @@
+import { useSelector } from "react-redux";
 import React, { useState, useEffect } from "react";
 import { riderProfileDetails } from "../../../Utils/utils";
 import styles from "../Component/profileDetails.module.css";
 import SubmitButton from "../../../Components/Common/SubmitButton";
 const ProfileDetails = ({ profileData }) => {
+  const user = useSelector((state) => state.user.userData);
+  const [message, setMessage] = useState("");
   // State to hold input values
   const [riderName, setRiderName] = useState("");
   const [riderEmail, setRiderEmail] = useState("");
@@ -19,12 +22,18 @@ const ProfileDetails = ({ profileData }) => {
 
   // Function to handle the Save button click
   const handleSave = async () => {
-    await riderProfileDetails(profileData.UserId, profileData.token, {
-      PhoneNumber: riderPhone,
-    });
+    setMessage("");
+    try {
+      const response = await riderProfileDetails(user.userId, user.token, { userEmail: riderEmail, PhoneNumber: riderPhone });
+      const data = await response.json();
+      if (!response.ok || !data) throw new Error("Unable to save profile.");
+      setMessage("Profile saved.");
+    } catch (error) { setMessage(error.message); }
   };
+
   return (
     <>
+      {message && <p role="status">{message}</p>}
       <div className={styles.riderDetailsContainer}>
         <label>Rider:</label>
         <input
@@ -58,7 +67,7 @@ const ProfileDetails = ({ profileData }) => {
         <input
           type="tel" // Changed to type tel for phone number format
           disabled={true}
-          value={profileData.averageRating}
+          value={profileData.averageRating ?? 0}
           onChange={(e) => setRiderPhone(e.target.value)}
         />
       </div>

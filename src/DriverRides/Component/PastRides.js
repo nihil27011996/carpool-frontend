@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { fetchRide, updateStatus } from "../../Utils/ride";
+import React, { useState } from "react";
+import { updateStatus } from "../../Utils/ride";
 import styles from "./PatRides.module.css";
 
 const PastRides = ({ rideData, driverData, updateRideData }) => {
+  const [error, setError] = useState("");
   return (
     <div className={styles.pastRidesContainer}>
+      {error && <p role="alert">{error}</p>}
       <div className={styles.title}>
         <span>{`${driverData.userEmail} Created Rides`}</span>
       </div>
@@ -16,7 +17,7 @@ const PastRides = ({ rideData, driverData, updateRideData }) => {
         {rideData.length > 0 ? (
           <div className={styles.rideContainerDetails}>
             {rideData.map((ride) => (
-              <div className={styles.detailsContainer}>
+              <div key={ride.rideId || ride._id} className={styles.detailsContainer}>
                 <div key={ride.id} className={styles.rideDetails}>
                   <div className={styles.contentDetails}>
                     <span>{`Destination: ${ride.Destination}`}</span>
@@ -45,12 +46,13 @@ const PastRides = ({ rideData, driverData, updateRideData }) => {
                     }
                     onClick={async (e) => {
                       e.preventDefault();
-                      await updateStatus(
-                        ride.rideId,
-                        { status: "cancelled" },
-                        driverData.token
-                      );
-                      updateRideData();
+                      setError("");
+                      try {
+                        const response = await updateStatus(ride.rideId, { status: "cancelled" }, driverData.token);
+                        if (!response.ok) throw new Error("Unable to cancel the ride. Please try again.");
+                        await updateRideData();
+                      } catch (error) { setError(error.message); }
+
                     }}
                   >
                     Cancel

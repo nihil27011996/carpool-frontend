@@ -1,0 +1,22 @@
+import React from "react";
+import "@testing-library/jest-dom";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
+import Signup from "./UserProfileCreation";
+import { createUser } from "../Utils/Signup/SignUp";
+jest.mock("../Utils/Signup/SignUp");
+test("stays on signup and displays a server error when creation fails", async () => {
+  createUser.mockResolvedValue({ ok: false, json: async () => ({ message: "User already exists" }) });
+  const { container } = render(<MemoryRouter><Routes><Route path="/" element={<Signup />} /><Route path="/login" element={<h1>Login page</h1>} /></Routes></MemoryRouter>);
+  const inputs = container.querySelectorAll("input");
+  fireEvent.change(inputs[0], { target: { value: "alice@example.com" } });
+  fireEvent.change(inputs[1], { target: { value: "alice" } });
+  const password = container.querySelector('input[type="password"]');
+  fireEvent.change(password, { target: { value: "password" } });
+  const phone = Array.from(inputs).find((input) => /phone/i.test(input.placeholder));
+  fireEvent.change(phone, { target: { value: "1234567890" } });
+  fireEvent.change(screen.getByRole("combobox"), { target: { value: "Rider" } });
+  fireEvent.submit(container.querySelector("form"));
+  expect(await screen.findByRole("alert")).toHaveTextContent("User already exists");
+  expect(screen.queryByRole("heading", { name: "Login page" })).not.toBeInTheDocument();
+});

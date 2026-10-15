@@ -13,7 +13,7 @@ console.log("INSIDE RIDE MATCH COMPONENT");
           const response = await distanceMatrix({
             origins: [riderLocation],
             destinations: [driver.location],
-            key: 'AIzaSyBaE0BFCbpDBdN5NkUK2DA-2Jm7IRnoGZg',
+            key: process.env.REACT_APP_GOOGLE_API,
           }).asPromise();
           return {
             driver,

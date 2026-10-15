@@ -1,40 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styles from "../driver/navBarComponent-driver.module.css";
 import { useDispatch } from "react-redux";
-import { removeUser } from "../../Slice/userSlice";
+import { logout } from "../../Utils/session";
 import { Link } from "react-router-dom";
-import { removeAuth } from "../../Slice/authSlice";
+
 // import { socket } from "../../App.js";
 
 const DriverNavBar = ({ driver }) => {
-  const [notificationCount, setNotificationCount] = useState(0);
-  const [message, setMessage] = useState();
   const dispatch = useDispatch();
 
-  const handleLogoutButton = (event) => {
-    // Prevent default link behavior to handle logout programmatically
-    //dispatch(teardownConnection());  // Dispatch action to disconnect the socket
-    dispatch(removeUser()); // Dispatch action to remove driver data
-    dispatch(removeAuth());
-    // Optionally navigate to a different page programmatically if needed
-  };
-
-  /*   useEffect(() => {
-    dispatch(messageSocket());
-  },[dispatch]); */
-
-  /*   useEffect(() => {
-    const socketListener = socket.on(
-      "approval_notification",
-      (notificationData) => {
-        // Handle the notification data received from the server
-        setMessage(notificationData); // Update message state with received data
-        // Increment notification count
-        setNotificationCount((prevCount) => prevCount + 1);
-        // You can update the UI, show a notification, or perform any other action here
-      }
-    );
-  }, []); // Run this effect only once when the component mounts */
+  const handleLogoutButton = () => dispatch(logout());
 
   return (
     <header className={styles.header}>
@@ -126,14 +101,13 @@ const DriverNavBar = ({ driver }) => {
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke-width="1.5"
+                strokeWidth="1.5"
                 stroke="currentColor"
-                class="size-6"
                 className={styles.profileIcon}
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   d="M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H6.911a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661Z"
                 />
               </svg>

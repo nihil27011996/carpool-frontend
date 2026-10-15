@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
 import styles from "./CreateRide.module.css";
 import { useSelector } from "react-redux";
@@ -8,29 +7,9 @@ import SubmitButton from "../Components/Common/SubmitButton.js";
 const libraries = ["places"];
 const DriverRide = () => {
   const parsedData = useSelector((state) => state.user.userData);
-  const navigate = useNavigate();
-  const [data, setData] = useState({
-    DriverOrderNumber: "",
-    DriverId: "",
-    StartingLocation: "",
-    Destination: "",
-    DriverPostStatus: "Open",
-    Seats: "",
-    Cost: "",
-    OriginLatitude: "",
-    OriginLongitude: "",
-    DestinationLatitude: "",
-    DestinationLongitude: "",
-  });
-  const [originLat, setOriginLat] = useState(0);
-  const [originLng, setOriginLng] = useState(0);
-  const [destinationLat, setDestinationLat] = useState(0);
-  const [destinationLng, setDestinationLng] = useState(0);
   const [pickUpTime, setPickUpTime] = useState("");
-  const [directions, setDirections] = useState(null);
   const [cost, setCost] = useState(0);
   const [seats, setSeats] = useState(0);
-  const [showPayment, setshowPayment] = useState(false);
   const [showButton, setShowButton] = useState(false);
   const [error, setError] = useState("");
   const [errorFlag, setErrorFlag] = useState(false);
@@ -45,16 +24,13 @@ const DriverRide = () => {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const existingRecord = await fetchOngoingRide(
         parsedData.id,
         parsedData.token
       );
+      if (!existingRecord.ok) throw new Error("Failed to load ongoing rides");
       const reponse = await existingRecord.json();
       // Check if the response is null or undefined
       if (reponse.length === 0) {
@@ -71,7 +47,10 @@ const DriverRide = () => {
       setErrorFlag(true);
       setShowButton(false); // Ensure button is hidden on error
     }
-  };
+  }, [parsedData.id, parsedData.token]);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
 
   const originRef = useRef();
   const destinationRef = useRef();
@@ -84,7 +63,7 @@ const DriverRide = () => {
     return <div>loading......</div>;
   }
   const handleGeocodeLocation = async (location) => {
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${location}&key=${process.env.REACT_APP_GOOGLE_API}`;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${process.env.REACT_APP_GOOGLE_API}`;
     try {
       const response = await fetch(url);
       const data = await response.json();
@@ -102,29 +81,40 @@ const DriverRide = () => {
   };
 
   const PostRide = async () => {
+    setErrorFlag(false);
+    if (!originRef.current.value.trim() || !destinationRef.current.value.trim() || !Number.isInteger(Number(seats)) || Number(seats) <= 0 || !Number.isFinite(Number(cost)) || Number(cost) <= 0 || !pickUpTime || !Number.isFinite(Date.parse(pickUpTime)) || Date.parse(pickUpTime) <= Date.now()) {
+      setError("Enter both locations, a future pickup time, positive seats, and a positive fare.");
+      setErrorFlag(true);
+      return;
+    }
     const origin = await handleGeocodeLocation(originRef.current.value);
     const destination = await handleGeocodeLocation(
       destinationRef.current.value
     );
 
+    if (!origin || !destination) {
+      setErrorFlag(true);
+      return;
+    }
     try {
       const ridePayload = {
         driver: parsedData.id, // Assuming this is an ObjectId from the "userAuths" collection
         StartingLocation: originRef.current.value,
         Destination: destinationRef.current.value,
         status: "available",
-        Cost: cost,
+        Cost: Number(cost),
+        PickUpTime: new Date(pickUpTime).toISOString(),
         OriginLatitude: origin.latProp,
         OriginLongitude: origin.lngProp,
         DestinationLatitude: destination.latProp,
         DestinationLongitude: destination.lngProp,
-        Availableseats: seats,
+        Availableseats: Number(seats),
       };
       const responseData = await createRide(ridePayload, parsedData.token);
       if (!responseData.ok) {
         setError("Failed to create the Post");
         setErrorFlag(true);
-        console.error("Failed to create the Post");
+        return;
       }
       setShowButton(false);
       originRef.current.value = "";
@@ -132,7 +122,8 @@ const DriverRide = () => {
       setCost(0);
       destinationRef.current.value = "";
     } catch (error) {
-      console.error(error);
+      setError("Unable to create the ride. Please try again.");
+      setErrorFlag(true);
     }
   };
 
@@ -141,6 +132,10 @@ const DriverRide = () => {
       <div className={styles.addRideContainer}>
         <div className={styles.loginFormContainer}>
           <form className={styles.loginForm}>
+            {errorFlag && <p role="alert">{error}</p>}
+            <div className={styles.inputContainer}>
+              <input aria-label="Pickup time" type="datetime-local" value={pickUpTime} onChange={(e) => setPickUpTime(e.target.value)} className={styles.inputbox} required />
+            </div>
             <div className={styles.inputContainer}>
               <Autocomplete className={styles.inputContainer}>
                 <input
@@ -202,7 +197,7 @@ const DriverRide = () => {
               </div>
             ) : (
               <div className={styles.alert}>
-                <span classNamee={styles.closebtn}>&times;</span>
+                <span className={styles.closebtn}>&times;</span>
                 <strong>Hold on!</strong> Complete the previous Ride to start
                 one!
               </div>

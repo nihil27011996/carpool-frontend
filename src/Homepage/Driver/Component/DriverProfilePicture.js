@@ -1,12 +1,6 @@
 import React from "react";
 
 const DriverProfilePicture = ({ imageUrl, handleClick, handleImageUpload }) => {
-  const onClickImageUpload = async (e) => {
-    e.preventDefault();
-    const file = e.target.files[0];
-    handleImageUpload(file);
-  };
-
   const handleUpload = (e) => {
     handleClick();
   };

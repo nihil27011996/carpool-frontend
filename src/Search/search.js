@@ -1,25 +1,17 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
-import PaymentComp from "../Payment/payment";
 import GetClosestDriver from "./Components/GetClosestDriver.js";
-import emailjs from "emailjs-com";
 import styles from "./Search.module.css";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import SearchDriverButton from "../Components/Common/SearchDriverButton.js";
-import Alert from "../Components/Common/alert.js";
 import MapComponent from "../Components/Common/MapComponent.js";
 import ModalComponent from "../Components/Common/modalcomponent.js";
-import { riderRequest } from "../Utils/utils.js";
-import { useDispatch } from "react-redux";
-import { storeRider } from "../Slice/riderSlice.js";
-
 const libraries = ["places"];
 const RiderFinder = () => {
   /*   const storedData = localStorage.getItem('rider');
   const parsedData? = JSON.parse(storedData); */
   const parsedData = useSelector((state) => state.user.userData);
-  const navigate = useNavigate();
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [pickUpTime, setPickUpTime] = useState("");
@@ -27,53 +19,10 @@ const RiderFinder = () => {
   const [seats, setSeat] = useState("");
   const [diplayDrivers, setDisplayDrivers] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [showPayment, setshowPayment] = useState(false);
-  const [showButton, setShowButton] = useState(true);
-  const [costPerSeat, setCostPerSeat] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
-  const dispatch = useDispatch();
   const toggleModal = () => {
     setIsOpen(!isOpen);
   };
-
-  if (!parsedData) {
-    navigate("/login");
-  }
-
-  /*  useEffect(() => {
-    async function fetchData() {
-      const existingRecord = await riderRequest(
-        parsedData?.id,
-        parsedData?.token
-      );
-      if (!existingRecord.ok) {
-        dispatch(storeRider({}));
-        navigate("/login");
-      }
-      const existingRecordData = await existingRecord.json();
-      if (!existingRecordData) {
-        setShowButton(true);
-        return;
-      } else if (existingRecordData.length > 0) {
-        const recordPayment = existingRecordData.filter(
-          (record) =>
-            record.CommuteStatus === "Approved" && record.PaymentFlag == "N"
-        );
-        if (recordPayment.length > 0) {
-          setshowPayment(true);
-          return;
-        }
-      } else if (
-        existingRecordData.CommuteStatus === "Approved" &&
-        existingRecordData.PaymentFlag === "N"
-      ) {
-        setshowPayment(true);
-        return;
-      }
-    }
-
-    fetchData();
-  }, [showButton, showPayment, parsedData?.token, parsedData?.userId]); */
 
   const originRef = useRef();
   const destinationRef = useRef();
@@ -81,6 +30,8 @@ const RiderFinder = () => {
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_API,
     libraries: libraries,
   });
+
+  if (!parsedData) return <Navigate to="/login" replace />;
 
   if (!isLoaded) {
     return (
@@ -105,12 +56,8 @@ const RiderFinder = () => {
     }
   };
 
-  const calculateCost = (cost) => {
-    setCostPerSeat(cost);
-  };
-
   const handleGeocodeLocation = async (location) => {
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${location}&key=${process.env.REACT_APP_GOOGLE_API}`;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${process.env.REACT_APP_GOOGLE_API}`;
     try {
       const response = await fetch(url);
       const data = await response.json();
@@ -127,27 +74,20 @@ const RiderFinder = () => {
     }
   };
 
-  const sendConfirmationEmail = () => {
-    const templateID = "template_a34i9to";
-    const serviceID = "service_ei1jycj";
-    const userID = "O25MTvtRdtBmJjw3S77ib";
-
-    emailjs
-      .send(serviceID, templateID, userID)
-      .then((response) => {
-        console.log("Email sent:", response.text);
-      })
-      .catch((error) => {
-        console.error("Email error:", error);
-      });
-  };
-
   const searchForRide = async () => {
+    setErrorMessage("");
+    if (!originRef.current.value.trim() || !destinationRef.current.value.trim() || !Number.isInteger(Number(seats)) || Number(seats) <= 0 || !pickUpTime || !Number.isFinite(Date.parse(pickUpTime)) || Date.parse(pickUpTime) <= Date.now()) {
+      setErrorMessage("Enter both locations, a future pickup time, and a positive whole number of seats.");
+      return;
+    }
+    setDisplayDrivers(false);
+    setIsOpen(false);
     const origincord = await handleGeocodeLocation(originRef.current.value);
 
     const destinationcord = await handleGeocodeLocation(
       destinationRef.current.value
     );
+    if (!origincord || !destinationcord) return;
     if (
       originRef.current.value &&
       destinationRef.current.value &&
@@ -166,9 +106,9 @@ const RiderFinder = () => {
       setOrigin(origincord);
       setDestination(destinationcord);
       setDisplayDrivers(true);
-      setTimeout(() => setIsOpen(true), 3000);
+      setIsOpen(true);
 
-      console.log("set the flag to true");
+
     }
   };
   //console.log(showPayment == true)
@@ -177,6 +117,7 @@ const RiderFinder = () => {
       <main className={styles.main}>
         <div className={styles.container}>
           <div className={styles.searchcontainerform}>
+            {errorMessage && <p role="alert">{errorMessage}</p>}
             <form className={styles.searchloginform}>
               <Autocomplete>
                 <input
@@ -223,11 +164,7 @@ const RiderFinder = () => {
                 placeholder="Seats"
               />
 
-              {showButton === true ? (
-                <SearchDriverButton searchForRide={searchForRide} />
-              ) : (
-                <Alert />
-              )}
+              <SearchDriverButton searchForRide={searchForRide} />
             </form>
           </div>
 
@@ -253,17 +190,7 @@ const RiderFinder = () => {
           ) : null}
           <div className={styles.mapcontainer}>
             <MapComponent directions={directions} />
-            {showPayment === true ? (
-              <div className={styles.paymentrider}>
-                <PaymentComp
-                  cost={calculateCost}
-                  riderEmail="rutuja.patil17@vit.edu"
-                  riderUserName="riderRutuja"
-                />
-              </div>
-            ) : (
-              <p></p>
-            )}
+
           </div>
         </div>
       </main>

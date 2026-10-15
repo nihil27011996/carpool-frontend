@@ -1,70 +1,36 @@
-# Getting Started with Create React App
+# Carpool frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React 18 application for driver and rider registration, profiles, ride creation, matching, requests, and trip history. Uses Redux Toolkit with redux-persist, React Router, Google Maps, and Firebase Storage.
 
-## Available Scripts
+## Run locally
 
-In the project directory, you can run:
+1. Run `npm ci`.
+2. Copy `.env.example` to `.env` and fill in the Google Maps and Firebase settings.
+3. Start the separate backend and set `REACT_APP_BACKEND_URL` to its origin (for example `http://localhost:9000`, without `/carpool/v1`).
+4. Run `npm start`.
 
-### `npm start`
+`npm test -- --watchAll=false --runInBand` runs the regression tests. `npm run build` creates the production bundle. Configure hosting to serve `index.html` for frontend routes.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Application flow
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+`src/index.js` supplies the persisted Redux store. `src/CarpoolApplication.js` defines public pages and nested role-protected pages. `src/Utils/session.js` validates the session and clears browser storage and Redux state on logout or expiration. Existing sessions require a matching token, persisted authentication, and an unexpired session timestamp.
 
-### `npm test`
+Drivers create rides with locations, pickup time, seats, and total fare. Riders search by route, pickup time, and seats. Matching retains the original combined pickup/destination distance limit of 5 km, requires enough seats and a positive fare, and allows pickup times within one hour. These are frontend matching rules; capacity and pricing must also be enforced by the backend.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Profiles use the backend's public `UserId` identifier (`userId` in the login response); ride references use the MongoDB identifier (`id` in the login response). Requests use `RequestId` for approval decisions. Trip lists use the current `/carpool/v1/rideRequest` API instead of obsolete `/riderOrders` endpoints.
 
-### `npm run build`
+## Backend integration gaps
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The adjacent backend was inspected but not modified as part of this frontend change:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- Its request decision route declares `:RequestId`, but `updateRideRequest` reads `request.params.RideRequestId`. Fix that mismatch before approval/rejection can succeed. The frontend sends `{ commuterStatus: "approved" | "rejected" }` and treats a null response as failure.
+- Approval must reserve seats atomically on the server. Its current decision service only changes request status.
+- No payment route is registered in the inspected backend. Checkout requires `REACT_APP_STRIPE_PUBLISHABLE_KEY`, a numeric ride fare, and a working payment service. The payment service must verify the fare from the ride and confirm payment before returning `{ success: true }`. The bare `/payment` page has no fare and therefore does not offer checkout. No real payment was exercised during validation.
+- The request collection endpoint does not implement rider filtering. Rider trip history filters the returned records for display; server-side ownership checks and filtering remain necessary.
+- Rating and trip-completion controls from the obsolete orders API are not part of the current trip list. Those features need a supported backend contract.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Configuration
 
-### `npm run eject`
+All `REACT_APP_*` values are included in the browser bundle. Use browser-restricted Google Maps keys and appropriate Firebase Storage rules. `.env` is ignored for future additions, but the existing file was already tracked; adding an ignore rule does not remove it from Git history. The hardcoded key in the unused matching prototype has been replaced with environment configuration.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The test suite uses mocked services; a passing build does not verify live backend, Firebase, Maps, Stripe, or email delivery.

@@ -23,9 +23,11 @@ const ResetPassword = () => {
     try {
       const res = await resetPassword({
         resetPasswordToken: token,
-        newPassword,
+        userPassword: newPassword,
       });
-      setMessage(res.data.message || "Password reset successfully");
+      const data = await res.json();
+      if (!res.ok) throw new Error("Password reset failed");
+      setMessage(data?.message || "Password reset successfully");
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       setMessage("Reset link is invalid or expired.");

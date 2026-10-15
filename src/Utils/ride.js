@@ -16,7 +16,7 @@ export const fetchOngoingRide = async (userId, token) => {
 };
 
 export const fetchRide = async (userId, token) => {
-  const getRide = await fetch(`${apiUrl}/carpool/v1/rides?driver=${userId}`, {
+  const getRide = await fetch(`${apiUrl}/carpool/v1/rides?driverId=${userId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -54,7 +54,6 @@ export const updateStatus = async (userId, body, token) => {
 };
 
 export const fetchRequestedRide = async (userId, token) => {
-  console.log(userId);
   const fetchRequestedRide = await fetch(
     `${apiUrl}/carpool/v1/rideRequest?driver=${userId}&CommuteStatus=pending`,
     {
@@ -95,6 +94,24 @@ export const findRider = async (token) => {
   });
 
   return findRider;
+};
+
+export const findNearbyRide = async (search, token) => {
+  const query = new URLSearchParams({
+    startLat: search.startLat,
+    startLon: search.startLon,
+    endLat: search.endLat,
+    endLon: search.endLon,
+    seats: search.seats,
+    PickUpTime: search.PickUpTime,
+  });
+  return fetch(`${apiUrl}/carpool/v1/rides/nearby?${query}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 
 export const requestRide = async (body, token) => {

@@ -1,14 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
-import * as firebase from "../../../Config/firebase-config";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import React from "react";
 import styles from "../RiderHome.module.css";
 const ProfilePicture = ({ imageUrl, handleClick, handleImageUpload }) => {
-  const [error, setError] = useState("");
 
   const onClickImageUpload = async (e) => {
     e.preventDefault();
     const file = e.target.files[0];
-    handleImageUpload(file);
+    if (file) handleImageUpload(file);
   };
 
   const handleUpload = (e) => {

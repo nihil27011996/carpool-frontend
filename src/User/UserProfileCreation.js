@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { userExits, createUser } from "../Utils/Signup/SignUp";
+import { createUser } from "../Utils/Signup/SignUp";
 import styles from "./ProfileCreation.module.css";
 
 const ProfileCreation = () => {
@@ -18,7 +18,7 @@ const ProfileCreation = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const [showDriverInput, setDhowDriverInput] = useState(false);
-  const [showLoginButton, setShowLoginButton] = useState(false);
+
 
   const handleUsernameChange = (event) => {
     setUsername(event.target.value);
@@ -64,84 +64,40 @@ const ProfileCreation = () => {
     setvehcilePlate(event.target.value);
   };
 
-  const handleLogin = () => {
-    navigate("/login");
-  };
-
   const handleSubmit = async (event) => {
-    if (!email || !username || !password || !phoneNumber) {
-      alert("Please fill out all fields.");
-      return;
-    }
-
-    // Check if the email address is valid
-    const emailPattern = /\S+@\S+\.\S+/;
-    if (!emailPattern.test(email)) {
-      alert("Please enter a valid email address.");
-      return;
-    }
-
     event.preventDefault();
-    let postDriver = false;
-    let postRider = false;
-    const existingRecord = await userExits(username);
-    const existingRecordData = await existingRecord.json();
-    // Filter the results based on the username field
-
-    // const recordExists = existingRecordData.some(record => record.userName === username || record.userPassword === password );
-    let payload;
-    if (existingRecordData) {
-      alert("Record with same username already exists! Lets loginnnnn");
-      setShowLoginButton(true);
-      handleLogin();
+    setError("");
+    if (!email || !username || !password || !phoneNumber || !commuterType) {
+      setError("Please fill out all required fields and select a commuter type.");
       return;
-    } else {
-      try {
-        const userPayload =
-          commuterType === "Rider"
-            ? {
-                userName: username,
-                userPassword: password,
-                userEmail: email,
-                commuterType: commuterType,
-                PhoneNumber: phoneNumber,
-              }
-            : {
-                userName: username,
-                userPassword: password,
-                userEmail: email,
-                commuterType: commuterType,
-                PhoneNumber: phoneNumber,
-                driverDetails: {
-                  licenseNumber: licenseNumber,
-                  vehicle: {
-                    make: vehcileMake,
-                    model: vehcileModel,
-                    year: vehcileYear,
-                    plateNumber: vehcilePlate,
-                  },
-                },
-              };
-        const response = await createUser(userPayload);
-        payload = await response.json();
-        if (!response.ok) {
-          console.error("There was an error creating your profile.");
-        }
-      } catch (error) {
-        console.error(error);
-        setError("There was an error creating your profile.");
-      }
     }
-
-    // Submit the form
-    alert("Sign up successfull!");
-    navigate("/login");
+    if (commuterType === "Driver" && (!licenseNumber || !vehcileMake || !vehcileModel || !vehcileYear || !vehcilePlate)) {
+      setError("Please fill out all driver and vehicle details.");
+      return;
+    }
+    try {
+      const payload = {
+        userName: username, userPassword: password, userEmail: email,
+        commuterType, PhoneNumber: phoneNumber,
+        ...(commuterType === "Driver" ? { driverDetails: {
+          licenseNumber, vehicle: { make: vehcileMake, model: vehcileModel,
+            year: vehcileYear, plateNumber: vehcilePlate }
+        }} : {})
+      };
+      const response = await createUser(payload);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Unable to create your profile.");
+      navigate("/login");
+    } catch (error) {
+      setError(error.message || "Unable to create your profile. Please try again.");
+    }
   };
 
   return (
     <div className={styles.registerParentContainer}>
       <div className={styles.registerContainer}>
-        <form className={styles.signUpForm}>
+        <form className={styles.signUpForm} onSubmit={handleSubmit}>
+          {error && <p role="alert">{error}</p>}
           <div className={styles.inputLabelContainer}>
             <input
               type="email"
@@ -265,7 +221,7 @@ const ProfileCreation = () => {
             </select>
           </div>
           <div className={styles.registerButton}>
-            <button type="submit" onClick={handleSubmit}>
+            <button type="submit">
               CREATE PROFILE
             </button>
           </div>

@@ -1,28 +1,40 @@
-import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import React, { useState } from "react";
 import { riderProfileDetails } from "../../../Utils/utils";
 import styles from "../Component/driverprofileDetails.module.css";
 import SubmitButton from "../../../Components/Common/SubmitButton";
 const DriverProfileDetails = ({ profileData }) => {
+  const user = useSelector((state) => state.user.userData);
+  const [message, setMessage] = useState("");
   // State to hold input values
-  const [driverName, setDriverName] = useState(profileData?.userName);
-  const [driverEmail, setDriverEmail] = useState(profileData?.userEmail);
-  const [driverPhone, setDriverPhone] = useState(profileData?.PhoneNumber);
+  const [driverName, setDriverName] = useState(profileData?.userName || "");
+  const [driverEmail, setDriverEmail] = useState(profileData?.userEmail || "");
+  const [driverPhone, setDriverPhone] = useState(profileData?.PhoneNumber || "");
   const [licenseNumber, setLicenseNumber] = useState(
-    profileData.driverDetails?.licenseNumber
+    profileData.driverDetails?.licenseNumber || ""
   );
-  const [make, setMake] = useState(profileData.driverDetails?.vehicle.make);
-  const [model, setModel] = useState(profileData.driverDetails?.vehicle.model);
-  const [year, setYear] = useState(profileData.driverDetails?.vehicle.year);
+  const [make, setMake] = useState(profileData.driverDetails?.vehicle?.make || "");
+  const [model, setModel] = useState(profileData.driverDetails?.vehicle?.model || "");
+  const [year, setYear] = useState(profileData.driverDetails?.vehicle?.year || "");
   const [platNumber, setPlatNumber] = useState(
-    profileData.driverDetails?.vehicle.plateNumber
+    profileData.driverDetails?.vehicle?.plateNumber || ""
   );
 
   // Function to handle the Save button click
   const handleSave = async () => {
-    const updateUser = await riderProfileDetails();
+    setMessage("");
+    try {
+      const response = await riderProfileDetails(user.userId, user.token, { userName: driverName, userEmail: driverEmail, PhoneNumber: driverPhone,
+        driverDetails: { licenseNumber, vehicle: { make, model, year, plateNumber: platNumber } } });
+      const data = await response.json();
+      if (!response.ok || !data) throw new Error("Unable to save profile.");
+      setMessage("Profile saved.");
+    } catch (error) { setMessage(error.message); }
   };
+
   return (
     <>
+      {message && <p role="status">{message}</p>}
       <div className={styles.driverVechileContainer}>
         <div className={styles.driverDetails}>
           <div className={styles.riderDetailsContainer}>

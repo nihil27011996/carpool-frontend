@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import * as firebase from "../../Config/firebase-config.js";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "../Driver/DriverHome.css";
-import DriverNavBar from "../../Navbar/driver/navBarComponent-driver.js";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { driverDetails } from "../../Utils/utils.js";
@@ -18,7 +17,6 @@ const DriverRide = () => {
   const [profileData, setProfileData] = useState();
   const [rating, setRating] = useState(0);
   const [error, setError] = useState("");
-  const [rate, setRate] = useState(0);
   const [imageUrl, setImageUrl] = useState("");
   const [load, setLoad] = useState(false);
   const navigate = useNavigate();
@@ -28,15 +26,7 @@ const DriverRide = () => {
     }
   }, [userData, navigate]);
 
-  // Fetch profile information on component mount
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchProfileInformation();
-    };
-
-    fetchData();
-  }, []);
-
   const fetchProfileInformation = async () => {
     setLoad(true);
     try {
@@ -46,6 +36,7 @@ const DriverRide = () => {
         setProfileData(data);
         fetchProfileImage();
         calculateAverageRating(data?.ratings);
+        setError("");
       } else {
         throw new Error("Failed to fetch profile data");
       }
@@ -84,8 +75,12 @@ const DriverRide = () => {
     }
   };
 
+    fetchProfileInformation();
+  }, [driverId, userData?.token]);
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
+    if (!file) return;
     const imageRef = ref(
       firebase.storage,
       `${driverId}/${driverId}_profile_image`
@@ -106,6 +101,8 @@ const DriverRide = () => {
 
   return (
     <div className="driver-home-main-page">
+      {error && <p role="alert">{error}</p>}
+      <p>Average rating: {rating}</p>
       {load ? (
         <>
           <Loader />
@@ -124,7 +121,7 @@ const DriverRide = () => {
               </div>
             ) : (
               <>
-                <Loader />
+                {!error && <Loader />}
               </>
             )}
           </div>
