@@ -36,3 +36,32 @@
     transform: rotate(360deg);
   }
 }
+
+/* Container of the suggestions list */
+.pac-container {
+  z-index: 9999 !important;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  font-family: "Inter", sans-serif;
+  overflow: hidden;
+}
+
+/* Each suggestion item */
+.pac-item {
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #111111;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.pac-item:hover {
+  background-color: #f9fafb;
+  cursor: pointer;
+}
+
+/* Bold match portion */
+.pac-item-query {
+  font-weight: 600;
+}

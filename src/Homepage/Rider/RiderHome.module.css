@@ -8,21 +8,29 @@
 
 .homePageContainer {
   height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .riderProfleContainer {
-  border-radius: 20px;
-  border-style: solid;
-  border-color: rgb(243, 243, 243);
-  width: 30%;
-  height: 60%;
-  transform: translate(100%, 20%);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  background-color: #ffffff;
+  max-width: 400px;
+  border-radius: 16px;
+  box-sizing: border-box;
+  padding: 2% 0 2% 0;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  /* background-color: #05386b; */
-  border-color: black;
-  transition: box-shadow 0.3s ease;
-  background-color: white;
+  gap: 20px;
+}
+
+@media (min-width: 421px) {
+  .riderProfleContainer {
+    width: 400px;
+  }
 }
 
 .riderCard {
@@ -51,7 +59,8 @@
 
 .riderProfileButton {
   height: 40px;
-  border-radius: 20px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
 }
 
 .riderProfileImageContainer {
@@ -79,4 +88,6 @@
   justify-content: center;
   flex-direction: column;
   align-items: center;
+  gap: 20px;
+  margin-top: 2%;
 }

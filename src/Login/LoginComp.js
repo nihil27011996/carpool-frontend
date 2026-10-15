@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
 import { useDispatch } from "react-redux";
 import { storeUser } from "../Slice/userSlice.js";
@@ -67,9 +67,6 @@ const Login = () => {
 
   return (
     <div className={styles.loginparentcontainer}>
-      <nav className={styles.navBar}>
-        <span>Carpool!!!</span>
-      </nav>
       <main className={styles.mainLogin}>
         {errorFlag ? (
           <ToastComponent visibility={errorFlag} message={error} />
@@ -78,17 +75,19 @@ const Login = () => {
         )}
         <div className={styles.formContainer}>
           <form className={styles.loginForm}>
-            <span>Login to enjoy offers while riding</span>
+            <h1 className={styles.headingText}>Welcome back!</h1>
+            <p className={styles.welcomeText}>Login to book your ride...</p>
             <div className={styles.inputContainer}>
               <input
                 key="username"
                 type="text"
                 value={username}
+                placeholder="User Name"
                 onChange={handleUsernameChange}
                 className={errorFlag ? styles.userNameError : styles.userName}
                 required={true}
               />
-              <label>Username</label>
+              {/* <label className={styles.inputLabel}>Username</label> */}
             </div>
 
             <div className={styles.inputContainer}>
@@ -96,11 +95,12 @@ const Login = () => {
                 key="password"
                 type={passwordType}
                 value={password}
+                placeholder="Password"
                 onChange={handlePasswordChange}
                 className={errorFlag ? styles.userNameError : styles.userName}
                 required={true}
               />
-              <label>Password</label>
+              {/* <label>Password</label> */}
               <div className={styles.iconContainer}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -140,13 +140,15 @@ const Login = () => {
 
             <SubmitButton
               submitform={handleSubmit}
-              className={styles.submitButton}
+              buttonStyle={styles.submitButton}
               disabled={disable}
               text="Login"
             ></SubmitButton>
             <div>
-              <span>Don't have an account?</span>
-              <a href="/createProfile">Sign up now</a>
+              <span>Don't have an account?</span>&nbsp;
+              <Link className={styles.linkText} to="/createProfile">
+                Sign Up
+              </Link>
             </div>
           </form>
         </div>

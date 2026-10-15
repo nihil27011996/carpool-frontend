@@ -74,7 +74,7 @@ const ProfileDetails = ({ profileData }) => {
       <SubmitButton
         submitform={handleSave}
         text="Save"
-        className={styles.submitButton}
+        buttonStyle={styles.submitButton}
       />
     </>
   );

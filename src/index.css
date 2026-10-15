@@ -1,23 +1,48 @@
 html,
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: Inter, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   width: 100vw;
   height: 100vh;
-  font-size: 10px;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family: Inter, sans-serif;
 }
 
 #root {
   width: 100vw;
   height: 100vh;
   background-color: #f0f0f0;
+}
+
+/* Container of the suggestions list */
+.pac-container {
+  z-index: 9999 !important;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  font-family: "Inter", sans-serif;
+  overflow: hidden;
+}
+
+/* Each suggestion item */
+.pac-item {
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #111111;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.pac-item:hover {
+  background-color: #f9fafb;
+  cursor: pointer;
+}
+
+/* Bold match portion */
+.pac-item-query {
+  font-weight: 600;
 }

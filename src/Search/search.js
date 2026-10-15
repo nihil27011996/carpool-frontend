@@ -119,7 +119,7 @@ const RiderFinder = () => {
           <div className={styles.searchcontainerform}>
             {errorMessage && <p role="alert">{errorMessage}</p>}
             <form className={styles.searchloginform}>
-              <Autocomplete>
+              <Autocomplete className="">
                 <input
                   id="origin"
                   type="text"

@@ -117,7 +117,11 @@ const DriverProfileDetails = ({ profileData }) => {
       <div className={styles.riderRatingContainer}>
         <label>Ratings:</label> {profileData.ratings}
       </div>
-      <SubmitButton submitform={handleSave} text="Save" />
+      <SubmitButton
+        submitform={handleSave}
+        text="Save"
+        buttonStyle={styles.submitButton}
+      />
     </>
   );
 };

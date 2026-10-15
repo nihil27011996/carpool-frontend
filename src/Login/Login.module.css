@@ -6,33 +6,46 @@
   height: 100%;
 }
 
-.navBar {
-  background-color: black;
-  color: white;
-  padding: 10px;
-  height: 5%;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-}
-
 .mainLogin {
   width: 100%;
-  height: 95%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 100%;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .formContainer {
-  border-radius: 10px;
-  border: 2px solid black;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-  width: 30%;
-  height: 50%;
-  position: relative;
+  border-radius: 16px;
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.05);
+  max-width: 420px;
   background-color: white;
+  padding: 10px;
+}
+
+@media (min-width: 421px) {
+  .formContainer {
+    width: 420px;
+  }
+}
+
+.headingText {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  display: inline;
+}
+
+.welcomeText {
+  font-size: 14px;
+  font-weight: 400;
+  margin: 0;
+  display: inline;
+}
+
+.inputLabel {
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .loginForm {
@@ -40,30 +53,62 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
   margin: 20% 0 0 0;
 }
 
-.loginForm > span {
-  font-size: 15px;
-}
-
 .submitButton {
-  width: 90%;
-  height: 40px;
+  width: 98%;
+  height: 50px;
   border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
   border-color: black;
-  color: white;
-  background-color: #1e1e1e;
+  color: #ffffff;
+  background-color: #111111;
+  cursor: pointer;
+  padding: 12px;
+  transition: background-color 200ms ease-in-out;
+
+  &:hover {
+    background-color: #1f2937;
+  }
 }
 
 .userName {
   width: 90%;
-  height: 40px;
-  border-radius: 10px;
-  font-size: 20px;
-  border: 1px solid #ccc; /* Common default border style for inputs */
+  height: 44px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 400;
+  padding: 0 14px;
+  border: 1px solid #d1d5db; /* Common default border style for inputs */
   background-color: #f0f0f0; /* Ensuring background is white */
+
+  &:hover {
+    color: #111111;
+  }
+
+  &:focus {
+    border-color: black;
+    border: 1px solid #111111;
+    outline: none;
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+.linkText {
+  font-size: 13px;
+  font-weight: 500;
+  color: #3b82f6;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .inputContainer {
@@ -96,17 +141,18 @@
   left: 90%;
   display: flex;
   align-items: center;
-}
-
-.inputContainer .userName:focus {
-  border-color: black; /* Change border color to black on focus */
+  size: 18px;
+  color: #6b7280;
 }
 
 .userNameError {
   width: 90%;
-  height: 40px;
-  border-radius: 10px;
-  background-color: #eeeeee;
+  height: 44px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 400;
+  padding: 0 14px;
+  border: 1px solid #d1d5db; /* Common default border style for inputs */
+  background-color: #f0f0f0; /* Ensuring background is white */
   border-color: red;
-  /*   box-shadow: 5px 5px 10px #4d4d4d; */
 }

@@ -1,13 +1,4 @@
-const apiUrl = process.env.REACT_APP_BACKEND_URL;
+import { fetchAction } from "./fetchUtil";
 
-export const resetPassword = async (body) => {
-  const resetPassord = await fetch(`${apiUrl}/carpool/v1/user/resetPassword`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-
-  return resetPassord;
-};
+export const resetPassword = (body) =>
+  fetchAction("POST", null, body, "/carpool/v1/user/resetPassword");

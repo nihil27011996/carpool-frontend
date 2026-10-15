@@ -35,30 +35,32 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <h2 className={styles.heading}>Reset Password</h2>
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <input
-          className={styles.input}
-          type="password"
-          placeholder="New password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          required
-        />
-        <input
-          className={styles.input}
-          type="password"
-          placeholder="Confirm new password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-        />
-        <button className={styles.button} type="submit">
-          Reset Password
-        </button>
-      </form>
-      {message && <p className={styles.message}>{message}</p>}
+    <div className={styles.resetMainContainer}>
+      <div className={styles.container}>
+        <h2 className={styles.heading}>Reset Password</h2>
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <input
+            className={styles.input}
+            type="password"
+            placeholder="New password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            required
+          />
+          <input
+            className={styles.input}
+            type="password"
+            placeholder="Confirm new password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+          <button className={styles.button} type="submit">
+            Reset Password
+          </button>
+        </form>
+        {message && <p className={styles.message}>{message}</p>}
+      </div>
     </div>
   );
 };
